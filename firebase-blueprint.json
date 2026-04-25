@@ -1,0 +1,106 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access control.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "cpf": { "type": "string" },
+        "role": { "type": "string", "enum": ["PARTNER", "ADMIN"] },
+        "status": { "type": "string", "enum": ["ACTIVE", "UNDER_REVIEW", "SUSPENDED"] },
+        "adminCode": { "type": "string", "description": "Linked admin code for partners" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "role", "status", "cpf"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "Customer referral created by a partner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "partnerId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "clientPhone": { "type": "string" },
+        "vehicleType": { "type": "string", "enum": ["Carro", "Caminhão", "Camionete", "Moto", "Agrícola"] },
+        "location": {
+          "type": "object",
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" }
+          }
+        },
+        "status": { "type": "string", "enum": ["PENDING", "IN_SERVICE", "COMPLETED", "REJECTED"] },
+        "serviceValue": { "type": "number" },
+        "commissionPercent": { "type": "number" },
+        "commissionValue": { "type": "number" },
+        "qrCode": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Financial record of a commission.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "leadId": { "type": "string" },
+        "partnerId": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["PENDING", "BILLED", "PAID", "OVERDUE"] },
+        "invoiceId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Invoice": {
+      "title": "Invoice",
+      "description": "Monthly consolidation of commissions for a partner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "partnerId": { "type": "string" },
+        "month": { "type": "string" },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["PENDING", "PAID", "OVERDUE"] },
+        "dueDate": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "AppConfig": {
+      "title": "AppConfig",
+      "description": "Global application settings like theme palette.",
+      "type": "object",
+      "properties": {
+        "primaryColor": { "type": "string" },
+        "updatedBy": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents."
+    },
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Indication/Lead documents."
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Individual commission records."
+    },
+    "/invoices/{invoiceId}": {
+      "schema": "Invoice",
+      "description": "Monthly invoices."
+    },
+    "/settings/{configId}": {
+      "schema": "AppConfig",
+      "description": "System settings including theme and identity."
+    }
+  }
+}

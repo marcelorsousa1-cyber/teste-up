@@ -1,0 +1,6 @@
+{
+  "name": "UP Performance",
+  "description": "SaaS platform for automotive referrals with commission tracking, lead management, and bento-grid dashboards.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["Firebase", "Full-Stack", "GPS Tracking"]
+}

@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Global Helpers ---
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isAdmin() { 
+      // Fast check via token email for bootstrapped admin
+      return isSignedIn() && 
+        (request.auth.token.email == 'marcelorsousa1@gmail.com' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN');
+    }
+    function isEmailVerified() { return request.auth.token.email_verified == true; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    // --- User Validation ---
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'name', 'email', 'role', 'status', 'cpf', 'createdAt']) &&
+             data.uid == request.auth.uid &&
+             data.role in ['PARTNER', 'ADMIN'] &&
+             data.status in ['ACTIVE', 'UNDER_REVIEW', 'SUSPENDED'] &&
+             data.name is string && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 100 &&
+             data.cpf is string && data.cpf.size() == 11;
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && (isOwner(userId) || isAdmin());
+      // For list, we restrict to self or admin
+      allow list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      
+      allow create: if isSignedIn() && isValidId(userId) && isOwner(userId) && isValidUser(incoming());
+      allow update: if isSignedIn() && isValidId(userId) && (
+        (isOwner(userId) && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'phone', 'email', 'updatedAt']) && isValidUser(incoming())) ||
+        isAdmin()
+      );
+    }
+
+    // --- Lead Validation ---
+    function isValidLead(data) {
+      return data.keys().hasAll(['partnerId', 'clientName', 'clientPhone', 'vehicleType', 'status', 'createdAt']) &&
+             data.partnerId == request.auth.uid &&
+             data.clientName is string && data.clientName.size() <= 100 &&
+             data.clientPhone is string && data.clientPhone.size() <= 20 &&
+             data.vehicleType in ['Carro', 'Caminhão', 'Camionete', 'Moto', 'Agrícola'] &&
+             data.status in ['PENDING', 'IN_SERVICE', 'COMPLETED', 'REJECTED'];
+    }
+
+    match /leads/{leadId} {
+      allow get: if isSignedIn() && isValidId(leadId) && (isOwner(existing().partnerId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.partnerId == request.auth.uid || isAdmin());
+      
+      allow create: if isSignedIn() && isValidId(leadId) && isValidLead(incoming());
+      allow update: if isSignedIn() && isValidId(leadId) && (
+        isAdmin() || 
+        (isOwner(existing().partnerId) && incoming().diff(existing()).affectedKeys().hasOnly(['clientName', 'clientPhone', 'vehicleType', 'updatedAt']) && isValidLead(incoming()))
+      );
+      allow delete: if isAdmin() && isValidId(leadId);
+    }
+
+    // --- Invoice Validation ---
+    match /invoices/{invoiceId} {
+      allow get: if isSignedIn() && isValidId(invoiceId) && (isOwner(existing().partnerId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.partnerId == request.auth.uid || isAdmin());
+      allow write: if isAdmin() && isValidId(invoiceId);
+    }
+
+    // --- Settings Validation ---
+    match /settings/{configId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

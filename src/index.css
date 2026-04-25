@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Space Grotesk", sans-serif;
+  
+  --color-neon-green: var(--neon-green-color, #39FF14);
+  --color-dark-surface: #050505;
+  --color-dark-card: #0A0A0A;
+  --color-dark-border: #151515;
+  --color-dark-accent: #1F1F1F;
+}
+
+:root {
+  --neon-green-color: #39FF14;
+}
+
+@layer base {
+  body {
+    @apply bg-dark-surface text-[#FAFAFA] font-sans antialiased selection:bg-neon-green selection:text-black min-h-screen;
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(57, 255, 20, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(57, 255, 20, 0.05) 0%, transparent 40%),
+      linear-gradient(rgba(18, 18, 18, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(18, 18, 18, 0.1) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  }
+}
+
+@utility tech-grid {
+  background-image: 
+    linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+@utility scanline {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(0, 0, 0, 0.1) 51%,
+      transparent 51%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.2;
+  }
+}
+
+@utility bento-card {
+  @apply bg-dark-card border border-dark-border rounded-[2.5rem] p-8 transition-all duration-500 hover:border-neon-green/30 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] relative overflow-hidden backdrop-blur-2xl;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.2), transparent);
+    animation: scan-line 6s linear infinite;
+  }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+
+@utility neon-glow {
+  box-shadow: 0 0 35px var(--neon-green-color);
+}
+
+@utility neon-text {
+  text-shadow: 0 0 20px var(--neon-green-color), 0 0 10px var(--neon-green-color);
+}
+
+@utility floating-3d {
+  filter: drop-shadow(0 20px 40px var(--neon-green-color));
+  transform: perspective(2000px);
+}
+
+@utility car-track {
+  @apply bg-zinc-900/40 h-2 rounded-full relative overflow-hidden border border-white/5;
+}
+
+@utility car-progress {
+  @apply bg-neon-green h-full rounded-full shadow-[0_0_25px_var(--neon-green-color)] transition-all duration-300;
+}
+
+@utility tech-button {
+  @apply relative overflow-hidden bg-neon-green text-black font-display font-black py-4 px-10 rounded-2xl transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-tighter text-base italic;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 1), 0 0 20px rgba(57, 255, 20, 0.2);
+  &:hover {
+    @apply -translate-y-1 -translate-x-1;
+    box-shadow: 8px 8px 0px rgba(0, 0, 0, 1), 0 0 40px rgba(57, 255, 20, 0.4);
+  }
+}
+
+@utility tech-input {
+  @apply w-full bg-black/60 border border-dark-border rounded-2xl py-5 px-8 focus:border-neon-green/40 focus:bg-black/80 outline-none transition-all duration-300 text-white font-mono text-sm placeholder:text-zinc-700;
+}
+
+@utility glass-card {
+  @apply bg-white/5 border border-white/10 backdrop-blur-xl rounded-[2.5rem] transition-all duration-300;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-dark-surface;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-dark-border rounded-full border-2 border-dark-surface;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-neon-green/40;
+}
