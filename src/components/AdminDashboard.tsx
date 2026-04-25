@@ -218,19 +218,22 @@ export default function AdminDashboard({ profile, initialAppConfig }: { profile:
 
       {/* Sidebar */}
       <aside className="w-20 lg:w-72 bg-dark-card border-r border-dark-border flex flex-col p-6 sticky top-0 h-screen z-50 backdrop-blur-3xl bg-opacity-80">
-        <div className="flex flex-col items-center lg:items-start gap-8 mb-12">
+        <button 
+          onClick={() => setView('HOME')}
+          className="flex flex-col items-center lg:items-start gap-8 mb-12 hover:scale-105 transition-transform"
+        >
           {appConfig.logoUrl ? (
             <img src={appConfig.logoUrl} alt="Logo" className="h-14 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(57,255,20,0.3)]" referrerPolicy="no-referrer" />
           ) : (
             <div className="w-14 h-14 bg-neon-green rounded-2xl flex items-center justify-center font-display font-black italic text-black shadow-neon-glow text-xl">UP</div>
           )}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block text-left">
             <div className="text-xl font-display font-black italic text-white tracking-tighter uppercase leading-none">
               CENTRAL <span className="text-neon-green neon-text">TORQUE</span>
             </div>
             <div className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.4em] mt-1 font-bold">Protocolo Ativo</div>
           </div>
-        </div>
+        </button>
 
         <nav className="flex-1 flex flex-col gap-2">
           <NavItem active={view === 'HOME'} icon={<LayoutDashboard size={20} />} label="Centro de Comando" onClick={() => setView('HOME')} />
@@ -244,16 +247,18 @@ export default function AdminDashboard({ profile, initialAppConfig }: { profile:
         <div className="pt-8 flex flex-col gap-3">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-2xl text-zinc-600 hover:text-white transition-all hover:bg-white/5 font-display font-black uppercase text-[10px] tracking-widest"
+            className="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-2xl text-red-500/60 hover:text-red-500 transition-all hover:bg-red-500/10 font-display font-black uppercase text-[10px] tracking-widest group"
           >
-            <LogOut size={20} />
-            <span className="hidden lg:block">ENCERRAR SESSÃO</span>
+            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+              <LogOut size={20} />
+            </div>
+            <span className="hidden lg:block">DESLIGAR TERMINAL</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 lg:p-12 relative z-10 overflow-x-hidden">
+      <main className="flex-1 p-6 lg:p-12 relative z-10 min-h-screen overflow-y-auto">
         <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -566,6 +571,26 @@ export default function AdminDashboard({ profile, initialAppConfig }: { profile:
 
                 <div className="space-y-6">
                   <div className="space-y-2">
+                    <label className="text-[11px] font-mono font-black text-zinc-600 uppercase tracking-widest ml-1">Coração do Sistema (Cor Primária)</label>
+                    <div className="flex gap-4 items-center">
+                      <input 
+                        type="color"
+                        className="w-14 h-14 bg-transparent border border-dark-border rounded-xl cursor-pointer"
+                        value={appConfig.primaryColor}
+                        onChange={(e) => {
+                          const newColor = e.target.value;
+                          setAppConfig({...appConfig, primaryColor: newColor});
+                          document.documentElement.style.setProperty('--neon-green-color', newColor);
+                        }}
+                      />
+                      <input 
+                        className="tech-input h-14 flex-1 font-mono"
+                        value={appConfig.primaryColor}
+                        onChange={(e) => setAppConfig({...appConfig, primaryColor: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
                     <label className="text-[11px] font-mono font-black text-zinc-600 uppercase tracking-widest ml-1">Label Operacional</label>
                     <input 
                       className="tech-input h-14"
@@ -621,6 +646,19 @@ export default function AdminDashboard({ profile, initialAppConfig }: { profile:
                   DISPARAR COMUNICADO
                 </button>
               </div>
+
+              <div className="col-span-full bento-card p-10 flex flex-col items-center justify-center gap-6 border-red-500/20 bg-red-500/5 mt-8">
+                <div className="text-center">
+                  <h3 className="text-xl font-display font-black text-white italic uppercase tracking-widest leading-none mb-2">Desconexão de Terminal</h3>
+                  <p className="text-zinc-500 text-xs font-mono uppercase tracking-[0.2em]">Encerrar sessão administrativa segura</p>
+                </div>
+                <button 
+                   onClick={handleLogout}
+                   className="tech-button bg-red-500 text-white hover:bg-red-600 px-12 italic shadow-[0_0_30px_rgba(239,68,68,0.3)]"
+                >
+                  DESLOGAR DO SISTEMA
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -637,7 +675,7 @@ export default function AdminDashboard({ profile, initialAppConfig }: { profile:
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="w-full max-w-xl bento-card border-neon-green/30 bg-black relative z-10 p-10 space-y-10"
+              className="w-full max-w-xl bento-card border-neon-green/30 bg-black relative z-10 p-10 space-y-10 max-h-[90vh] overflow-y-auto"
             >
               <div className="flex justify-between items-start">
                 <div>
@@ -693,6 +731,9 @@ export default function AdminDashboard({ profile, initialAppConfig }: { profile:
             </motion.div>
           </div>
         )}
+        
+        {/* Bottom spacer for mobile */}
+        <div className="h-24 lg:hidden" />
       </main>
     </div>
   );

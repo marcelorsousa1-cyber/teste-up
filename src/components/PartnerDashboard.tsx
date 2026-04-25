@@ -138,19 +138,22 @@ export default function PartnerDashboard({ profile, appConfig }: { profile: User
 
       {/* Sidebar */}
       <aside className="w-20 lg:w-72 bg-dark-card border-r border-dark-border flex flex-col p-6 sticky top-0 h-screen z-50 backdrop-blur-3xl bg-opacity-80">
-        <div className="flex flex-col items-center lg:items-start gap-8 mb-12">
+        <button 
+          onClick={() => setView('HOME')}
+          className="flex flex-col items-center lg:items-start gap-8 mb-12 hover:scale-105 transition-transform"
+        >
           {appConfig.logoUrl ? (
             <img src={appConfig.logoUrl} alt="Logo" className="h-10 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(57,255,20,0.3)]" referrerPolicy="no-referrer" />
           ) : (
             <div className="w-12 h-12 bg-neon-green rounded-2xl flex items-center justify-center font-display font-black italic text-black shadow-neon-glow text-lg">UP</div>
           )}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block text-left">
             <div className="text-lg font-display font-black italic text-white tracking-tighter uppercase leading-none">
               DASHBOARD <span className="text-neon-green neon-text">TORQUE</span>
             </div>
             <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-[0.4em] mt-1 font-bold">Acesso Parceiro</div>
           </div>
-        </div>
+        </button>
 
         <nav className="flex-1 flex flex-col gap-2">
           <NavItem active={view === 'HOME'} icon={LayoutDashboard} label="Visão Geral" onClick={() => setView('HOME')} />
@@ -163,16 +166,18 @@ export default function PartnerDashboard({ profile, appConfig }: { profile: User
         <div className="pt-8">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-2xl text-zinc-600 hover:text-white transition-all hover:bg-white/5 font-display font-black uppercase text-[10px] tracking-widest"
+            className="w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-2xl text-red-500/60 hover:text-red-500 transition-all hover:bg-red-500/10 font-display font-black uppercase text-[10px] tracking-widest group"
           >
-            <LogOut size={18} />
-            <span className="hidden lg:block">SAIR DO SISTEMA</span>
+            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+              <LogOut size={18} />
+            </div>
+            <span className="hidden lg:block">DESLIGAR TERMINAL</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 lg:p-12 relative z-10 overflow-x-hidden">
+      <main className="flex-1 p-6 lg:p-12 relative z-10 min-h-screen overflow-y-auto">
         <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -446,7 +451,7 @@ export default function PartnerDashboard({ profile, appConfig }: { profile: User
                animate={{ opacity: 1, scale: 1 }}
                className="max-w-2xl mx-auto py-12 flex flex-col items-center"
             >
-              <div className="bento-card p-12 text-center space-y-12 w-full border-neon-green/20 relative shadow-[0_0_100px_rgba(57,255,20,0.05)] italic">
+              <div className="bento-card p-8 lg:p-12 text-center space-y-8 lg:space-y-12 w-full border-neon-green/20 relative shadow-[0_0_100px_rgba(57,255,20,0.05)] italic">
                 <div className="text-center space-y-2 italic">
                   <h3 className="text-3xl font-display font-black text-white italic tracking-tighter uppercase leading-none">Nó de Convite Alpha</h3>
                   <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.6em] font-black">Handshake de Identidade Visual</p>
@@ -454,11 +459,11 @@ export default function PartnerDashboard({ profile, appConfig }: { profile: User
 
                 <div className="relative group">
                   <div className="absolute inset-0 bg-neon-green blur-[80px] opacity-10 group-hover:opacity-25 transition-all duration-700 animate-pulse" />
-                  <div className="bg-white p-12 rounded-[3.5rem] shadow-[0_0_60px_rgba(57,255,20,0.2)] relative z-10 inline-block">
+                  <div className="bg-white p-6 lg:p-12 rounded-[2.5rem] lg:rounded-[3.5rem] shadow-[0_0_60px_rgba(57,255,20,0.2)] relative z-10 inline-block overflow-hidden">
                     <QRCodeSVG 
                       id="qr-code-partner-id"
                       value={`https://${window.location.host}/register?code=${profile.adminCode}`} 
-                      size={280}
+                      size={window.innerWidth < 768 ? 200 : 280}
                       level="H"
                       includeMargin={false}
                     />
@@ -468,12 +473,12 @@ export default function PartnerDashboard({ profile, appConfig }: { profile: User
                 <div className="flex justify-center">
                   <button 
                     onClick={handleSaveQRCode}
-                    className="tech-button px-14 py-6 flex items-center justify-center gap-4 shadow-neon-glow-lg group"
+                    className="tech-button px-10 lg:px-14 py-4 lg:py-6 flex items-center justify-center gap-4 shadow-neon-glow-lg group"
                   >
                     <div className="bg-black/20 p-2 rounded-lg group-hover:bg-black/30 transition-colors">
                       <Save size={24} className="text-black" />
                     </div>
-                    <span className="text-xl">SALVAR ARQUIVO</span>
+                    <span className="text-lg lg:text-xl">SALVAR ARQUIVO</span>
                   </button>
                 </div>
 
@@ -490,7 +495,7 @@ export default function PartnerDashboard({ profile, appConfig }: { profile: User
         </AnimatePresence>
 
         {/* Bottom spacer for mobile */}
-        <div className="md:hidden h-24" />
+        <div className="h-24 lg:hidden" />
       </main>
     </div>
   );
